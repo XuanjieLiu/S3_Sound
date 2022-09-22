@@ -1,0 +1,5 @@
+sbatch ./ae_symm_4_repeat/train.sbatch
+sbatch ./vae_symm_0_repeat/train.sbatch
+sbatch ./vae_symm_4_no_repeat/train.sbatch
+sbatch ./vae_symm_4_repeat/train.sbatch
+sbatch ./vae_symm_4_repeat_timbre10d/train.sbatch

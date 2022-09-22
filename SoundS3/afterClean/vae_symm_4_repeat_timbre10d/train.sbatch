@@ -7,7 +7,7 @@
 #SBATCH --time=8:00:00
 #SBATCH --mem=8GB
 #SBATCH --gres=gpu:2080Ti:1
-#SBATCH --job-name=sound
+#SBATCH --job-name=v4r10
 #SBATCH --output=slurm_train.out
 #SBATCH --error=slurm_train.err
 #SBATCH --partition=aquila,gpu
