@@ -2,7 +2,7 @@ import math
 
 CONFIG = {
     'train_data_path': '../../../../makeSoundDatasets/datasets/cleanTrain',
-    'latent_code_num': 3,
+    'latent_code_num': 11,
     't_batch_multiple': 4,
     'r_batch_multiple': 256,
     'z_batch_multiple': 256,
