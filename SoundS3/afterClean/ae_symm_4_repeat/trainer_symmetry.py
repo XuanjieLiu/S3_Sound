@@ -207,7 +207,7 @@ class BallTrainer:
 
             if is_log:
                 self.model.save_tensor(self.model.state_dict(), self.model_path)
-                print(train_loss_counter.make_record(i))
+                print(train_loss_counter.make_record(i), flush=True)
                 train_loss_counter.record_and_clear(self.train_record_path, i)
             if i % self.checkpoint_interval == 0 and i != 0:
                 self.model.save_tensor(self.model.state_dict(), f'checkpoint_{i}.pt')
