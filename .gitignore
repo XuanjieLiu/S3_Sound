@@ -1,0 +1,14 @@
+*.pt
+*.txt
+*.png
+*.gif
+*.pyc
+*.wav
+*.mid
+*.deb
+*.zip
+*.sf2
+.idea
+.rar
+fluidsynth-2.2.5-win10-x64
+
