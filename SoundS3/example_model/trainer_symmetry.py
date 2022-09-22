@@ -2,12 +2,14 @@ import math
 import random
 import numpy as np
 import torch
+import torch.utils.data
 import torch.nn as nn
 import torch.optim as optim
 from torchvision.utils import save_image
 import os
 from normal_rnn import Conv2dGruConv2d, BATCH_SIZE, repeat_one_dim
-from SoundS3.SoundDataLoader import SoundDataLoader, norm_log2, norm_log2_reverse
+from SoundS3.shared import DEVICE
+from SoundS3.sound_dataset import Dataset, PersistentLoader, norm_log2, norm_log2_reverse
 from SoundS3.symmetry import make_translation_batch, make_random_rotation_batch, do_seq_symmetry, symm_trans, \
     symm_rotate, make_rand_zoom_batch, symm_zoom
 from SoundS3.loss_counter import LossCounter
@@ -54,7 +56,6 @@ def save_spectrogram(tensor, file_path, title=None, ylabel="freq_bin", aspect="a
     plt.clf()
     plt.close('all')
 
-
 def tensor2spec(tensor):
     return tensor.permute(1, 2, 0, 3).reshape(tensor.size(1), tensor.size(2),
                                               tensor.size(0) * tensor.size(3)).detach().cpu()
@@ -86,11 +87,13 @@ def symm_rotate_first3dim(z, rotator):
 
 class BallTrainer:
     def __init__(self, config, is_train=True):
-        self.model = Conv2dGruConv2d(config).cuda()
-        self.train_data_loader = SoundDataLoader(config['train_data_path'], is_train, time_frame_len=time_frame_len)
-        self.mse_loss = nn.MSELoss(reduction='sum').cuda()
-        device = torch.device('cuda:0')
-        self.model.to(device)
+        self.model = Conv2dGruConv2d(config).to(DEVICE)
+        self.dataset = Dataset(config['train_data_path'])
+        self.train_data_loader = PersistentLoader(
+            self.dataset, BATCH_SIZE, 
+        )
+        self.mse_loss = nn.MSELoss(reduction='sum').to(DEVICE)
+        self.model.to(DEVICE)
         self.model_path = config['model_path']
         self.kld_loss_scalar = config['kld_loss_scalar']
         self.z_rnn_loss_scalar = config['z_rnn_loss_scalar']
@@ -167,7 +170,7 @@ class BallTrainer:
         scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: self.scheduler_func(curr_iter))
         for i in range(iter_num, self.max_iter_num):
             curr_iter = iter_num
-            data = self.train_data_loader.load_a_random_batch(BATCH_SIZE).cuda()
+            data = next(self.train_data_loader).to(DEVICE)
             print(f'{i}')
             data = norm_log2(data, k=LOG_K)
             is_log = (i % self.log_interval == 0 and i != 0)
@@ -185,7 +188,7 @@ class BallTrainer:
             #                              z_range=self.z_range)
             T, Tr = make_translation_batch(batch_size=BATCH_SIZE * DT_BATCH_MULTIPLE, dim=np.array([1]),
                                            t_range=self.t_range)
-            # T = tensor_arrange(DT_BATCH_MULTIPLE, -2.4, 2.4, True).cuda().unsqueeze(1).repeat(1, BATCH_SIZE).reshape(BATCH_SIZE * DT_BATCH_MULTIPLE, 1)
+            # T = tensor_arrange(DT_BATCH_MULTIPLE, -2.4, 2.4, True).to(DEVICE).unsqueeze(1).repeat(1, BATCH_SIZE).reshape(BATCH_SIZE * DT_BATCH_MULTIPLE, 1)
             # Tr = -T
             z0_rnn = self.model.predict_with_symmetry(z_gt_p, I_sample_points, lambda z: z)
             vae_loss = self.calc_vae_loss(data, z_combine, mu, logvar, is_log * i)

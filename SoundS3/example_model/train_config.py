@@ -1,7 +1,7 @@
 import math
 
 CONFIG = {
-    'train_data_path': '../datasets/raising_falling_seq_midi_multi_instru_major_scale_wav/',
+    'train_data_path': '../../../makeSoundDatasets/datasets/cleanTrain',
     'latent_code_num': 3,
     't_batch_multiple': 4,
     'r_batch_multiple': 256,

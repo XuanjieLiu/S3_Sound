@@ -25,7 +25,7 @@ PITCH_GRAPH_ROOT = 'Pitch_graphs'
 PITCH_STD_RECORD = 'pitch_std_record.txt'
 
 def init_vae():
-    model = Conv2dGruConv2d(CONFIG).cuda()
+    model = Conv2dGruConv2d(CONFIG).to(DEVICE)
     model.eval()
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
@@ -131,7 +131,7 @@ class TransInvarTest:
                 print(f'Process: {i} / {data_num}, {int(i / data_num * 100)}%')
             wav_path = self.data_loader.data_path + self.data_loader.f_list[i]
             data_tuple = self.data_loader.load_a_audio_spec_from_disk(wav_path)
-            data = torch.stack([data_tuple], dim=0).cuda()
+            data = torch.stack([data_tuple], dim=0).to(DEVICE)
             data = norm_log2(data, k=LOG_K)
             z, mu, logvar = self.vae.batch_seq_encode_to_z(data)
             pitch_seq = mu[0, 0:7, 0].detach()

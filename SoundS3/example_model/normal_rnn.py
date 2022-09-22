@@ -1,3 +1,7 @@
+import sys
+from os import path
+sys.path.append(path.join(path.dirname(path.abspath(__file__)), '../../'))
+
 import numpy as np
 import torch
 import torch.nn as nn
@@ -5,12 +9,13 @@ from torch.autograd import Variable
 import gzip
 from SoundS3.symmetry import make_rotation_Y_batch, make_translation_batch
 import random
-
+from SoundS3.shared import DEVICE
+from SoundS3.dataset_config import *
 
 # todo: make these parameters configurable
 BATCH_SIZE = 32
 log_interval = 10
-IMG_CHANNEL = 2
+IMG_CHANNEL = 1
 
 LAST_H = 16
 LAST_W = 1
@@ -41,13 +46,18 @@ class Conv2dGruConv2d(nn.Module):
         self.base_len = config['base_len']
 
         self.encoder = nn.Sequential(
-            nn.Conv2d(IMG_CHANNEL, CHANNELS[0], kernel_size=(8, 4), stride=4, padding=(2, 0)),
+            # 513
+            nn.Conv2d(IMG_CHANNEL, CHANNELS[0], kernel_size=(5, ENCODE_STEP), stride=2, padding=(1, 0)),
             nn.ReLU(),
+            # 256
             nn.Conv2d(CHANNELS[0], CHANNELS[1], kernel_size=(8, 1), stride=4, padding=(2, 0)),
             nn.ReLU(),
+            # 64
             nn.Conv2d(CHANNELS[1], CHANNELS[2], kernel_size=(4, 1), stride=2, padding=(1, 0)),
             nn.ReLU(),
+            # 32
             nn.Conv2d(CHANNELS[2], CHANNELS[-1], kernel_size=(4, 1), stride=2, padding=(1, 0)),
+            # 16
             nn.ReLU(),
         )
 
@@ -80,7 +90,7 @@ class Conv2dGruConv2d(nn.Module):
             nn.ReLU(),
             nn.ConvTranspose2d(CHANNELS[-3], CHANNELS[-4], kernel_size=(8, 1), stride=4, padding=(2, 0)),
             nn.ReLU(),
-            nn.ConvTranspose2d(CHANNELS[-4], IMG_CHANNEL, kernel_size=(8, 4), stride=4, padding=(2, 0)),
+            nn.ConvTranspose2d(CHANNELS[-4], IMG_CHANNEL, kernel_size=(5, ENCODE_STEP), stride=2, padding=(1, 0)),
             nn.Sigmoid()
         )
 
@@ -93,7 +103,7 @@ class Conv2dGruConv2d(nn.Module):
         return torch.load(path)
 
     def reparameterize(self, mu, logvar):
-        eps = Variable(torch.randn(mu.size(0), mu.size(1))).cuda()
+        eps = Variable(torch.randn(mu.size(0), mu.size(1))).to(DEVICE)
         z = mu + eps * torch.exp(logvar) * 0.5
         return z
 
@@ -128,7 +138,7 @@ class Conv2dGruConv2d(nn.Module):
 
     def predict_with_symmetry(self, z_gt, sample_points, symm_func):
         z_SR_seq_batch = []
-        hidden_r = torch.zeros([self.rnn_num_layers, z_gt.size(0), self.rnn_hidden_size]).cuda()
+        hidden_r = torch.zeros([self.rnn_num_layers, z_gt.size(0), self.rnn_hidden_size]).to(DEVICE)
         for i in range(z_gt.size(1)):
             """Schedule sample"""
             if i in sample_points:

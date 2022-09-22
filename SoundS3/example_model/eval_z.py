@@ -65,7 +65,7 @@ def init_codes():
 
 
 def init_vae():
-    model = Conv2dGruConv2d(CONFIG).cuda()
+    model = Conv2dGruConv2d(CONFIG).to(DEVICE)
     model.eval()
     if os.path.exists(MODEL_PATH):
         model.load_state_dict(torch.load(MODEL_PATH))
@@ -286,7 +286,7 @@ class TestUI:
     def scale_list_move_func(self, base_latent_code):
         trans_code = base_latent_code
         for i in range(0, len(self.scale_var_list)):
-            add_tensor = torch.zeros(CODE_LEN, dtype=torch.float).cuda()
+            add_tensor = torch.zeros(CODE_LEN, dtype=torch.float).to(DEVICE)
             value = self.scale_var_list[i].get()
             add_tensor[i] += value
             trans_code = trans_code + add_tensor

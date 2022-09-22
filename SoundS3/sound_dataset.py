@@ -10,12 +10,15 @@ from scipy.signal import stft
 import librosa
 from tqdm import tqdm
 
-from dataset_config import *
+try:
+    from .dataset_config import *
+except ImportError:
+    from dataset_config import *
 
 IFFT_PATH = './ifft_output'
+DATASET_AUG = 256    # dataLoader init has high overhead
 
 assert WIN_LEN == 2 * HOP_LEN
-ENCODE_STEP = N_HOPS_PER_NOTE + N_HOPS_BETWEEN_NOTES
 N_BINS = WIN_LEN // 2 + 1
 
 class Dataset(torch.utils.data.Dataset):
@@ -54,16 +57,22 @@ class Dataset(torch.utils.data.Dataset):
                     :, 
                     note_i * ENCODE_STEP : (note_i + 1) * ENCODE_STEP, 
                 ]
+            datapoint = datapoint.unsqueeze(1)
+            # print(datapoint.shape)
             self.data.append((
                 instrument_name, start_pitch, datapoint, 
             ))
         print('max_value =', max_value)
     
     def __getitem__(self, index):
+        index %= self.trueLen()
         instrument_name, start_pitch, datapoint = self.data[index]
         return datapoint
     
     def __len__(self):
+        return self.trueLen() * DATASET_AUG
+    
+    def trueLen(self):
         return len(self.index)
 
 def norm_log2(ts: torch.Tensor, k=12.5):
@@ -89,6 +98,19 @@ def debugIfft(y, mag, filename):
     y_hat *= y.norm() / y_hat.norm()
     soundfile.write(filename, y_hat, SR)
 
+def PersistentLoader(dataset, batch_size):
+    while True:
+        loader = torch.utils.data.DataLoader(
+            dataset, batch_size, shuffle=True, 
+            num_workers=1, 
+        )
+        for batch in loader:
+            if batch.shape[0] != batch_size:
+                break
+            yield batch
+
 if __name__ == "__main__":
-    Dataset('../../makeSoundDatasets/datasets/cleanTrain')
-    # sdl.find_max_value()
+    dataset = Dataset('../../makeSoundDatasets/datasets/cleanTrain')
+    loader = PersistentLoader(dataset, 32)
+    for i, x in enumerate(loader):
+        print(i, x.shape)

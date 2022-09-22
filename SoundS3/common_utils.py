@@ -12,7 +12,7 @@ def create_path_if_not_exist(path):
 def make_a_ndarray_batch(ndarray, batch_size):
     tensor = torch.from_numpy(ndarray).to(torch.float32)
     size = torch.ones((batch_size, *ndarray.shape))
-    return torch.mul(tensor, size).cuda()
+    return torch.mul(tensor, size).to(DEVICE)
 
 
 def random_in_range(r_range: tuple):
