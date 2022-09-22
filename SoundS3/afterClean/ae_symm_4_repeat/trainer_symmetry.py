@@ -157,6 +157,7 @@ class BallTrainer:
         return self.scheduler_base_num ** curr_iter
 
     def train(self):
+        print('train', flush=True)
         create_path_if_not_exist(self.train_result_path)
         self.model.train()
         self.resume()
@@ -168,6 +169,7 @@ class BallTrainer:
         curr_iter = iter_num
         optimizer = optim.Adam(self.model.parameters(), lr=self.learning_rate)
         scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lambda epoch: self.scheduler_func(curr_iter))
+        print('train ready', flush=True)
         for i in range(iter_num, self.max_iter_num):
             curr_iter = iter_num
             data = next(self.train_data_loader).to(DEVICE)
