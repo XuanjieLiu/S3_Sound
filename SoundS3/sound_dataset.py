@@ -26,13 +26,14 @@ class Dataset(torch.utils.data.Dataset):
         with open(path.join(dataset_path, 'index.pickle'), 'rb') as f:
             self.index: List[Tuple[str, int]] = pickle.load(f)
         self.data = []
+        self.map = {}
         max_value = 0
         for instrument_name, start_pitch in tqdm(
             self.index, desc='Load data & stft', 
         ):
+            wav_name = f'{instrument_name}-{start_pitch}.wav'
             filename = path.join(
-                dataset_path, 
-                f'{instrument_name}-{start_pitch}.wav', 
+                dataset_path, wav_name, 
             )
             audio, _ = librosa.load(filename, SR)
             # print('audio', torch.Tensor(audio).norm())
@@ -62,6 +63,7 @@ class Dataset(torch.utils.data.Dataset):
             self.data.append((
                 instrument_name, start_pitch, datapoint, 
             ))
+            self.map[wav_name] = datapoint
         print('max_value =', max_value)
     
     def __getitem__(self, index):
