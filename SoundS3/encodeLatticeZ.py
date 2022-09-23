@@ -30,9 +30,6 @@ from trainer_symmetry import LOG_K
 # from example_model.trainer_symmetry import LOG_K
 
 import torch
-from scipy import stats
-import numpy as np
-# from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 from shared import DEVICE
@@ -67,7 +64,7 @@ def main():
         Y.append(z_pitch.detach())
     
     for instrument_name, (X, Y) in tqdm(
-        instruments.items(), desc='linear reg', 
+        instruments.items(), desc='write disk', 
     ):
         with open(path.join(RESULT_PATH, instrument_name + '_x.txt'), 'w') as f:
             for x in X:
