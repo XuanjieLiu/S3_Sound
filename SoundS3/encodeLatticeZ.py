@@ -1,5 +1,7 @@
 import sys
+import os
 from os import path
+import shutil
 
 # DATASET_NAME = 'single_note_GU'
 DATASET_NAME = sys.argv[1]
@@ -11,7 +13,12 @@ CHECKPOINT_NAME = 'checkpoint_200000.pt'
 
 # RESULT_NAME = 'test_set_vae_symm_4_repeat'
 RESULT_NAME = sys.argv[3]
-RESULT_PATH = './linearityEvalResults/' + RESULT_NAME + '.txt'
+RESULT_PATH = './linearityEvalResults/encode_' + RESULT_NAME + '/'
+try:
+    shutil.rmtree(RESULT_PATH)
+except FileNotFoundError:
+    pass
+os.mkdir(RESULT_PATH)
 
 sys.path.append(path.abspath(EXP_GROUP_MODEL_PATH))
 from normal_rnn import Conv2dGruConv2d
@@ -25,6 +32,7 @@ from trainer_symmetry import LOG_K
 import torch
 from scipy import stats
 import numpy as np
+# from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 from shared import DEVICE
@@ -58,21 +66,15 @@ def main():
         X.append(pitch)
         Y.append(z_pitch.detach())
     
-    R = {}
     for instrument_name, (X, Y) in tqdm(
         instruments.items(), desc='linear reg', 
     ):
-        (
-            slope, intercept, r_value, p_value, std_err, 
-        ) = stats.linregress(X, Y)
-        R[instrument_name] = r_value
-    
-    with open(RESULT_PATH, 'w') as f:
-        for instrument_name, r in tqdm(R.items(), desc='write disk'):
-            print(
-                instrument_name, ',', r, 
-                file=f, 
-            )
+        with open(path.join(RESULT_PATH, instrument_name + '_x.txt'), 'w') as f:
+            for x in X:
+                print(x, file=f)
+        with open(path.join(RESULT_PATH, instrument_name + '_y.txt'), 'w') as f:
+            for y in Y:
+                print(y.item(), file=f)
 
 if __name__ == '__main__':
     main()
