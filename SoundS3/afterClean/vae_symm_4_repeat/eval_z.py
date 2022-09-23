@@ -137,7 +137,9 @@ class TestUI:
             win_length=win_length,
             hop_length=hop_length,
         )
-        self.dataset = Dataset(CONFIG['train_data_path'])
+        self.dataset = Dataset(
+            CONFIG['train_data_path'], cache_all=False, 
+        )
         # self.data_loader = PersistentLoader(self.dataset, 32)
         self.selected_wav_spec_tensor = None
         self.selected_wav_latent_code = None
@@ -353,7 +355,7 @@ class TestUI:
         wav_idx = wav_list.curselection()
         wav_name = self.filtered_list[wav_idx[0]]
         # wav_path = WAV_PATH + wav_name
-        self.selected_wav_spec_tensor = self.dataset.map[wav_name]
+        self.selected_wav_spec_tensor = self.dataset.get(wav_name)
         selected_spec_frame = tensor2spec(self.selected_wav_spec_tensor)
         self.reset_scale_vars()
         save_spectrogram(selected_spec_frame[0], SPEC_PATH_ORIGIN, need_norm_reverse=False)

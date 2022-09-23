@@ -152,20 +152,18 @@ class Conv2dGruConv2d(nn.Module):
         return z_x0ESR
 
     """Z Repeat"""
-    def recon_via_rnn(self, z):
-        sample_points = list(range(z.size(1)))[self.base_len:]
-        z_s = z[..., 0:1]
-        z_c = z[..., 1:]
-        z_cr = repeat_one_dim(z_c, sample_range=self.base_len)
-        z_s1 = self.predict_with_symmetry(z_s, sample_points, lambda x: x)
-        z_time_combine = torch.cat((z_s[:, 0:1, ...], z_s1), dim=1)
-        z_code_combine = torch.cat((z_time_combine, z_cr), -1)
-        return self.batch_seq_decode_from_z(z_code_combine), z_code_combine
-
     # def recon_via_rnn(self, z):
     #     sample_points = list(range(z.size(1)))[self.base_len:]
-    #     z_1 = self.predict_with_symmetry(z, sample_points, lambda x: x)
-    #     z_time_combine = torch.cat((z[:, 0:1, ...], z_1), dim=1)
-    #     return self.batch_seq_decode_from_z(z_time_combine), z_time_combine
+    #     z_s = z[..., 0:1]
+    #     z_c = z[..., 1:]
+    #     z_cr = repeat_one_dim(z_c, sample_range=self.base_len)
+    #     z_s1 = self.predict_with_symmetry(z_s, sample_points, lambda x: x)
+    #     z_time_combine = torch.cat((z_s[:, 0:1, ...], z_s1), dim=1)
+    #     z_code_combine = torch.cat((z_time_combine, z_cr), -1)
+    #     return self.batch_seq_decode_from_z(z_code_combine), z_code_combine
 
-
+    def recon_via_rnn(self, z):
+        sample_points = list(range(z.size(1)))[self.base_len:]
+        z_1 = self.predict_with_symmetry(z, sample_points, lambda x: x)
+        z_time_combine = torch.cat((z[:, 0:1, ...], z_1), dim=1)
+        return self.batch_seq_decode_from_z(z_time_combine), z_time_combine

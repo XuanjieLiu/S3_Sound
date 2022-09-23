@@ -22,43 +22,29 @@ assert WIN_LEN == 2 * HOP_LEN
 N_BINS = WIN_LEN // 2 + 1
 
 class Dataset(torch.utils.data.Dataset):
-    def __init__(self, dataset_path, debug_ifft=False):
+    def __init__(
+        self, dataset_path, debug_ifft=False, 
+        cache_all=True, 
+    ):
+        self.dataset_path = dataset_path
         with open(path.join(dataset_path, 'index.pickle'), 'rb') as f:
             self.index: List[Tuple[str, int]] = pickle.load(f)
-        self.data = []
         self.map = {}
+        print(cache_all)
+        if cache_all:
+            self.cacheAll(debug_ifft)
+    
+    def cacheAll(self, debug_ifft):
+        self.data = []
         max_value = 0
         for instrument_name, start_pitch in tqdm(
             self.index, desc='Load data & stft', 
         ):
             wav_name = f'{instrument_name}-{start_pitch}.wav'
-            filename = path.join(
-                dataset_path, wav_name, 
+            datapoint = self.loadOneFile(
+                instrument_name, start_pitch, wav_name, debug_ifft, 
             )
-            audio, _ = librosa.load(filename, SR)
-            # print('audio', torch.Tensor(audio).norm())
-            _, _, spectrogram = stft(
-                audio, nperseg=WIN_LEN, 
-                noverlap=WIN_LEN - HOP_LEN, nfft=WIN_LEN, 
-            )
-            mag = torch.Tensor(np.abs(spectrogram)) * WIN_LEN
-            # print('mag', mag.norm())
-            max_value = max(max_value, mag.max())
-            if debug_ifft:
-                os.makedirs(IFFT_PATH, exist_ok=True)
-                debugIfft(audio, mag, path.join(
-                    IFFT_PATH, 
-                    f'{instrument_name}-{start_pitch}.wav', 
-                ))
-            datapoint = torch.zeros((
-                len(MAJOR_SCALE), N_BINS, ENCODE_STEP, 
-            ))
-            for note_i, _ in enumerate(MAJOR_SCALE):
-                datapoint[note_i, :, :] = mag[
-                    :, 
-                    note_i * ENCODE_STEP : (note_i + 1) * ENCODE_STEP, 
-                ]
-            datapoint = datapoint.unsqueeze(1)
+            max_value = max(max_value, datapoint.max())
             # print(datapoint.shape)
             self.data.append((
                 instrument_name, start_pitch, datapoint, 
@@ -76,6 +62,50 @@ class Dataset(torch.utils.data.Dataset):
     
     def trueLen(self):
         return len(self.index)
+    
+    def loadOneFile(
+        self, instrument_name, start_pitch, wav_name, 
+        debug_ifft=False, 
+    ):
+        filename = path.join(
+            self.dataset_path, wav_name, 
+        )
+        audio, _ = librosa.load(filename, SR)
+        # print('audio', torch.Tensor(audio).norm())
+        _, _, spectrogram = stft(
+            audio, nperseg=WIN_LEN, 
+            noverlap=WIN_LEN - HOP_LEN, nfft=WIN_LEN, 
+        )
+        mag = torch.Tensor(np.abs(spectrogram)) * WIN_LEN
+        # print('mag', mag.norm())
+        if debug_ifft:
+            os.makedirs(IFFT_PATH, exist_ok=True)
+            debugIfft(audio, mag, path.join(
+                IFFT_PATH, 
+                f'{instrument_name}-{start_pitch}.wav', 
+            ))
+        datapoint = torch.zeros((
+            len(MAJOR_SCALE), N_BINS, ENCODE_STEP, 
+        ))
+        for note_i, _ in enumerate(MAJOR_SCALE):
+            datapoint[note_i, :, :] = mag[
+                :, 
+                note_i * ENCODE_STEP : (note_i + 1) * ENCODE_STEP, 
+            ]
+        datapoint = datapoint.unsqueeze(1)
+        return datapoint
+    
+    def get(self, wav_name):
+        try:
+            return self.map[wav_name]
+        except KeyError:
+            x = wav_name.split('.wav')[0]
+            instrument_name, start_pitch = x.split('-')
+            datapoint = self.loadOneFile(
+                instrument_name, start_pitch, wav_name, 
+            )
+            self.map[wav_name] = datapoint
+            return datapoint
 
 def norm_log2(ts: torch.Tensor, k=12.5):
     return torch.log2(ts + 1) / k
