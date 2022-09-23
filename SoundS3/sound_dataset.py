@@ -30,6 +30,7 @@ class Dataset(torch.utils.data.Dataset):
         with open(path.join(dataset_path, 'index.pickle'), 'rb') as f:
             self.index: List[Tuple[str, int]] = pickle.load(f)
         self.map = {}
+        print(cache_all)
         if cache_all:
             self.cacheAll(debug_ifft)
     
@@ -98,8 +99,8 @@ class Dataset(torch.utils.data.Dataset):
         try:
             return self.map[wav_name]
         except KeyError:
-            x = wav_name.split('.wav')
-            instrument_name, start_pitch = x.split('_')
+            x = wav_name.split('.wav')[0]
+            instrument_name, start_pitch = x.split('-')
             datapoint = self.loadOneFile(
                 instrument_name, start_pitch, wav_name, 
             )
