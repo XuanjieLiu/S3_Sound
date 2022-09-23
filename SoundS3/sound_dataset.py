@@ -30,7 +30,6 @@ class Dataset(torch.utils.data.Dataset):
         with open(path.join(dataset_path, 'index.pickle'), 'rb') as f:
             self.index: List[Tuple[str, int]] = pickle.load(f)
         self.map = {}
-        print(cache_all)
         if cache_all:
             self.cacheAll(debug_ifft)
     
@@ -88,6 +87,8 @@ class Dataset(torch.utils.data.Dataset):
             len(MAJOR_SCALE), N_BINS, ENCODE_STEP, 
         ))
         for note_i, _ in enumerate(MAJOR_SCALE):
+            if (note_i + 1) * ENCODE_STEP >= mag.shape[1]:
+                break
             datapoint[note_i, :, :] = mag[
                 :, 
                 note_i * ENCODE_STEP : (note_i + 1) * ENCODE_STEP, 
