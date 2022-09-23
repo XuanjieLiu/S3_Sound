@@ -1,3 +1,7 @@
+import sys
+from os import path
+sys.path.append(path.join(path.dirname(path.abspath(__file__)), '../../'))
+
 from winsound import PlaySound, SND_MEMORY, SND_FILENAME
 
 import matplotlib.pyplot as plt
@@ -12,10 +16,12 @@ import torch
 from trainer_symmetry import save_spectrogram, tensor2spec, norm_log2, norm_log2_reverse, LOG_K
 import torchaudio.transforms as T
 import torchaudio
-from SoundS3.SoundDataLoader import SoundDataLoader
+from SoundS3.sound_dataset import Dataset, PersistentLoader
 import matplotlib
 from SoundS3.symmetry import rotation_x_mat, rotation_y_mat, rotation_z_mat, do_seq_symmetry, symm_rotate
 import numpy as np
+
+from SoundS3.shared import DEVICE
 
 matplotlib.use('AGG')
 
@@ -34,7 +40,7 @@ WAV_PATH_PRED_RECON = IMG_ROOT + "/pred_recon.wav"
 WAV_PATH_TRANSFORMED_SELF_RECON = IMG_ROOT + "/transformed_self_recon.wav"
 WAV_PATH_TRANSFORMED_PRED_RECON = IMG_ROOT + "/transformed_pred_recon.wav"
 DIY_WAVE_NAME = IMG_ROOT + "/diy_wave.wav"
-WAV_PATH = '../datasets/raising_falling_seq_midi_multi_instru_major_scale_wav/'
+WAV_PATH = '../../../../makeSoundDatasets/datasets/cleanTrain/'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 MODEL_PATH = 'checkpoint_150000.pt'
@@ -68,7 +74,7 @@ def init_vae():
     model = Conv2dGruConv2d(CONFIG).to(DEVICE)
     model.eval()
     if os.path.exists(MODEL_PATH):
-        model.load_state_dict(torch.load(MODEL_PATH))
+        model.load_state_dict(torch.load(MODEL_PATH, map_location=DEVICE))
         print(f"Model is loaded")
     return model
 
@@ -131,7 +137,8 @@ class TestUI:
             win_length=win_length,
             hop_length=hop_length,
         )
-        self.data_loader = SoundDataLoader(WAV_PATH, is_load_all_data_dict=False, time_frame_len=4)
+        self.dataset = Dataset(CONFIG['train_data_path'])
+        self.data_loader = PersistentLoader(self.dataset, 32)
         self.selected_wav_spec_tensor = None
         self.selected_wav_latent_code = None
 
@@ -346,7 +353,7 @@ class TestUI:
         wav_idx = wav_list.curselection()
         wav_name = self.filtered_list[wav_idx[0]]
         wav_path = WAV_PATH + wav_name
-        self.selected_wav_spec_tensor = self.data_loader.load_a_audio_spec_from_disk(wav_path)
+        self.selected_wav_spec_tensor = next(self.data_loader)
         selected_spec_frame = tensor2spec(self.selected_wav_spec_tensor)
         self.reset_scale_vars()
         save_spectrogram(selected_spec_frame[0], SPEC_PATH_ORIGIN, need_norm_reverse=False)
