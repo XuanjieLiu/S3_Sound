@@ -43,9 +43,9 @@ DIY_WAVE_NAME = IMG_ROOT + "/diy_wave.wav"
 WAV_PATH = '../../../../makeSoundDatasets/datasets/cleanTrain/'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-MODEL_PATH = 'checkpoint_150000.pt'
-n_fft = 2046
-win_length = None
+MODEL_PATH = 'checkpoint_200000.pt'
+n_fft = 1024
+win_length = 1024
 hop_length = 512
 sample_rate = 16000
 RANGE = 6.
@@ -138,7 +138,7 @@ class TestUI:
             hop_length=hop_length,
         )
         self.dataset = Dataset(CONFIG['train_data_path'])
-        self.data_loader = PersistentLoader(self.dataset, 32)
+        # self.data_loader = PersistentLoader(self.dataset, 32)
         self.selected_wav_spec_tensor = None
         self.selected_wav_latent_code = None
 
@@ -352,8 +352,8 @@ class TestUI:
     def view_selected_wav(self, wav_list):
         wav_idx = wav_list.curselection()
         wav_name = self.filtered_list[wav_idx[0]]
-        wav_path = WAV_PATH + wav_name
-        self.selected_wav_spec_tensor = next(self.data_loader)
+        # wav_path = WAV_PATH + wav_name
+        self.selected_wav_spec_tensor = self.dataset.map[wav_name]
         selected_spec_frame = tensor2spec(self.selected_wav_spec_tensor)
         self.reset_scale_vars()
         save_spectrogram(selected_spec_frame[0], SPEC_PATH_ORIGIN, need_norm_reverse=False)
