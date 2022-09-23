@@ -17,7 +17,7 @@ NOTE_INTERVAL = (N_SAMPLES_PER_NOTE + N_SAMPLES_BETWEEN_NOTES) / SR
 FADE_OUT_N_SAMPLES = 512
 FADE_OUT_FILTER = np.linspace(1, 0, FADE_OUT_N_SAMPLES)
 
-if __name__ == '__main__':
-    print(f'{N_SAMPLES_PER_NOTE=}')
-    print(f'{NOTE_DURATION=}')
-    print(f'{NOTE_INTERVAL=}')
+# if __name__ == '__main__':
+#     print(f'{N_SAMPLES_PER_NOTE=}')
+#     print(f'{NOTE_DURATION=}')
+#     print(f'{NOTE_INTERVAL=}')
