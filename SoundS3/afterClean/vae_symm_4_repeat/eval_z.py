@@ -143,7 +143,7 @@ class TestUI:
         self.selected_wav_latent_code = None
 
     def gen_recon_spec(self):
-        tensor = self.selected_wav_spec_tensor.unsqueeze(0)
+        tensor = self.selected_wav_spec_tensor.unsqueeze(0).to(DEVICE)
         normed_tensor = norm_log2(tensor, k=LOG_K)
         z_gt, mu, logvar = self.vae.batch_seq_encode_to_z(normed_tensor)
         self.selected_wav_latent_code = mu
