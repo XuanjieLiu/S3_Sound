@@ -14,7 +14,9 @@ EXP_GROUPS = [
 TASKS = [
     # path name, display name, x, y, plot style
     (
-        'encode', 'Embedding', 'pitch',   'z_pitch',
+        'encode', 'Embedding', 
+        ('pitch', 'Pitch'), 
+        ('z_pitch', '$z_p$'),
         dict(
             linestyle='none', 
             marker='.', 
@@ -22,13 +24,20 @@ TASKS = [
         ), 
     ), 
     (
-        'decode', 'Synthesis', 'z_pitch', 'yin_pitch',
+        'decode', 'Synthesis', 
+        ('z_pitch', '$z_p$'), 
+        ('yin_pitch', 'Detected Pitch'),
         dict(
             linestyle='none', 
             marker='.', 
             markersize=1, 
         ), 
     ), 
+]
+DATA_SETS = [
+    # path name, display name
+    ('train_set', 'Training Set'), 
+    ('test_set', 'Test Set'), 
 ]
 RESULT_PATH = './linearityEvalResults/%s_%s_%s/'
 COMMON_INSTRUMENTS = [
@@ -45,20 +54,22 @@ from tqdm import tqdm
 
 def main():
     for (
-        task_path_name, task_display, x_name, y_name, 
+        task_path_name, task_display, 
+        (x_path, x_display), 
+        (y_path, y_display), 
         plt_style, 
     ) in TASKS:
         fig, axeses = plt.subplots(2, len(EXP_GROUPS))
-        for row_i, (set_name, axes) in enumerate(zip(
-            ('train_set', 'test_set'), axeses, 
+        for row_i, ((set_path, set_display), axes) in enumerate(zip(
+            DATA_SETS, axeses, 
         )):
             for col_i, (exp_group, ax) in tqdm([*enumerate(
                 zip(EXP_GROUPS, axes)
-            )], f'{task_path_name} {set_name}'):
+            )], f'{task_display} {set_display}'):
                 # extract X, Y
                 data = {}
                 if exp_group is SPICE:
-                    if task_path_name == 'decode' or set_name == 'train_set':
+                    if task_path_name == 'decode' or set_path == 'train_set':
                         continue
                     with open(SPICE_PATH, 'r') as f:
                         for line in f:
@@ -75,7 +86,7 @@ def main():
                                 X.append(pitch)
                                 Y.append(z_pitch)
                 else:
-                    result_path = RESULT_PATH % (task_path_name, set_name, exp_group)
+                    result_path = RESULT_PATH % (task_path_name, set_path, exp_group)
                     for instrument_name in COMMON_INSTRUMENTS:
                         if instrument_name not in COMMON_INSTRUMENTS:
                             continue
@@ -87,16 +98,18 @@ def main():
                             ), 'r') as f:
                                 for line in f:
                                     output.append(float(line.strip()))
-                        f(X, x_name)
-                        f(Y, y_name)
+                        f(X, x_path)
+                        f(Y, y_path)
                         data[instrument_name] = (X, Y)
                 # plot X, Y
                 for instrument_name, (X, Y) in data.items():
                     ax.plot(X, Y, label=instrument_name, **plt_style)
                 if row_i == 0:
                     ax.set_title(exp_group)
+                if row_i == 1:
+                    ax.set_xlabel(x_display)
                 if col_i == 0:
-                    ax.set_ylabel(set_name + '\n 2nnn')
+                    ax.set_ylabel(set_display + '\n\n' + y_display)
         # plt.legend()
         fig.suptitle(task_display)
         plt.tight_layout()
