@@ -7,20 +7,20 @@ from os import path
 #     labelpad=10,
 # )
 
-# USING_METRIC = 'diffStd'
-# METRIC_DISPLAY = dict(
-#     ylabel='Std of Diff', 
-# )
+USING_METRIC = 'diffStd'
+METRIC_DISPLAY = dict(
+    ylabel='Std of Diff', 
+)
 
 # USING_METRIC = 'linearProjectionMSE'
 # METRIC_DISPLAY = dict(
 #     ylabel='Linear Projection MSE', 
 # )
 
-USING_METRIC = 'linearProjectionStdErr'
-METRIC_DISPLAY = dict(
-    ylabel='Linear Projection Std Error', 
-)
+# USING_METRIC = 'linearProjectionStdErr'
+# METRIC_DISPLAY = dict(
+#     ylabel='Linear Projection Std Error', 
+# )
 
 SPICE = 'SPICE'
 

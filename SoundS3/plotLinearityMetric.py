@@ -31,7 +31,7 @@ def loadData():
     data = {}
     for set_path, set_display in DATA_SETS:
         data_s = {}
-        data[set_display] = data_s
+        data[set_path] = set_display, data_s
         for (
             task_path_name, task_display, 
             (x_path, x_display), 
@@ -59,7 +59,7 @@ def loadData():
     return data
 
 def table(data):
-    for set_display, data_s in data.items():
+    for set_path, (set_display, data_s) in data.items():
         print(set_display)
         for _, (task_display, data_st) in data_s.items():
             print(' ', task_display)
@@ -74,14 +74,16 @@ def table(data):
                     ))
 
 def plot(data):
-    fig, axes = plt.subplots(2, 1)
-    for (set_display, data_s), ax in zip(data.items(), axes):
-        sBar = SmartBar()
-        for task_path, (task_display, data_st) in reversed(data_s.items()):
-            if task_path == 'decode':
-                task_kw = dict(hatch='xxxx')
+    fig, axes = plt.subplots(len(TASKS), 1)
+    sBars = [SmartBar() for _ in TASKS]
+    for set_path, (set_display, data_s) in reversed(data.items()):
+        for ax_i, (task_path, (task_display, data_st)) in enumerate(
+            data_s.items()
+        ):
+            if set_path == 'train_set':
+                set_kw = dict(hatch='xxxx')
             else:
-                task_kw = dict()
+                set_kw = dict()
             for exp_path, (exp_display, data_tse) in data_st.items():
                 if exp_path == 'vae_symm_4_repeat':
                     exp_kw = dict(
@@ -106,14 +108,19 @@ def plot(data):
                             values.append(data_tse[instrument_name])
                         except KeyError:
                             return
-                    sBar.addGroup(
-                        values, f'{task_display}, {exp_display}', 
-                        **exp_kw, **task_kw, 
+                    print(exp_display, set_display)
+                    sBars[ax_i].addGroup(
+                        values, f'{exp_display}, {set_display}', 
+                        **exp_kw, **set_kw, 
                     )
                 f()
-        sBar.setXTicks(COMMON_INSTRUMENTS)
-        sBar.draw(ax)
-        ax.set_title(set_display)
+    for ax_i, (task_path, (task_display, data_st)) in enumerate(
+        data_s.items()
+    ):
+        ax = axes[ax_i]
+        sBars[ax_i].setXTicks(COMMON_INSTRUMENTS)
+        sBars[ax_i].draw(ax)
+        ax.set_title(task_display)
         ax.set_xticklabels(
             ax.get_xticklabels(), rotation=20, ha='right', 
         )
