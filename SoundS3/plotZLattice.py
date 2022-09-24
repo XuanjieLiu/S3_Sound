@@ -7,16 +7,12 @@ from matplotlib.axes import Axes
 from matplotlib.figure import SubFigure
 from tqdm import tqdm
 
-plt.rcParams.update({
-    'text.usetex': True, 
-    'font.family': 'serif', 
-    'font.serif': ['Computer Modern'], 
-})
-
 FIGSIZE = (11, 5)
 WIDTH_RATIO = (7, 8)
 NECK_LINE_Y = .96
 
+import rc_params
+rc_params.init()
 from linearity_shared import *
 TASKS = [
     # path name, display name, x, y, plot style
