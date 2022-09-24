@@ -26,7 +26,18 @@ def main():
         '../../makeSoundDatasets/datasets/single_note', 
         cache_all=False, 
     ).index
-    for task in ('encode', 'decode'):
+    for task, x_name, y_name, plt_style in (
+        ('encode', 'pitch', 'z_pitch', dict(
+            linestyle='none', 
+            marker='.', 
+            markersize=1, 
+        )), 
+        ('decode', 'z_pitch', 'yin_pitch', dict(
+            linestyle='none', 
+            marker='.', 
+            markersize=1, 
+        )), 
+    ):
         fig, axeses = plt.subplots(2, len(EXP_GROUPS))
         for row_i, (set_name, axes) in enumerate(zip(
             ('train_set', 'test_set'), axeses, 
@@ -49,9 +60,9 @@ def main():
                         ), 'r') as f:
                             for line in f:
                                 output.append(float(line.strip()))
-                    f(X, 'x')
-                    f(Y, 'y')
-                    ax.plot(X, Y, label=instrument_name)
+                    f(X, x_name)
+                    f(Y, y_name)
+                    ax.plot(X, Y, label=instrument_name, **plt_style)
                 if row_i == 0:
                     ax.set_title(exp_group)
                 if col_i == 0:

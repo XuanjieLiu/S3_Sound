@@ -59,19 +59,19 @@ def main():
 
         if instrument_name not in instruments:
             instruments[instrument_name] = ([], [])
-        X, Y = instruments[instrument_name]
-        X.append(pitch)
-        Y.append(z_pitch.detach())
+        pitches, z_pitches = instruments[instrument_name]
+        pitches.append(pitch)
+        z_pitches.append(z_pitch.detach())
     
-    for instrument_name, (X, Y) in tqdm(
+    for instrument_name, (pitches, z_pitches) in tqdm(
         instruments.items(), desc='write disk', 
     ):
-        with open(path.join(RESULT_PATH, instrument_name + '_x.txt'), 'w') as f:
-            for x in X:
-                print(x, file=f)
-        with open(path.join(RESULT_PATH, instrument_name + '_y.txt'), 'w') as f:
-            for y in Y:
-                print(y.item(), file=f)
+        with open(path.join(RESULT_PATH, instrument_name + '_pitch.txt'), 'w') as f:
+            for pitch in pitches:
+                print(pitch, file=f)
+        with open(path.join(RESULT_PATH, instrument_name + '_z_pitch.txt'), 'w') as f:
+            for z_pitch in z_pitches:
+                print(z_pitch.item(), file=f)
 
 if __name__ == '__main__':
     main()
