@@ -49,7 +49,7 @@ COMMON_INSTRUMENTS = [
     # 'Church Bells', 
 ]
 
-SPICE_PATH = './SPICE_results/result_normalized.txt'
+SPICE_PATH = './SPICE_results/result_short.txt'
 
 def main():
     fig = plt.figure(constrained_layout=True, figsize=FIGSIZE)
