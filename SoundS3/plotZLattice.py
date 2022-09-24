@@ -14,9 +14,9 @@ EXP_GROUPS = [
 TASKS = [
     # path name, display name, x, y, plot style
     (
-        'encode', 'Embedding', 
-        ('pitch', 'Pitch'), 
-        ('z_pitch', '$z_p$'),
+        'decode', 'Synthesis', 
+        ('z_pitch', '$z_p$'), 
+        ('yin_pitch', 'Detected Pitch'),
         dict(
             linestyle='none', 
             marker='.', 
@@ -24,9 +24,9 @@ TASKS = [
         ), 
     ), 
     (
-        'decode', 'Synthesis', 
-        ('z_pitch', '$z_p$'), 
-        ('yin_pitch', 'Detected Pitch'),
+        'encode', 'Embedding', 
+        ('pitch', 'Pitch'), 
+        ('z_pitch', '$z_p$'),
         dict(
             linestyle='none', 
             marker='.', 
@@ -50,11 +50,18 @@ SPICE_PATH = './SPICE_results/result_normalized.txt'
 
 import numpy as np
 from matplotlib import pyplot as plt
+from matplotlib.lines import Line2D
+from matplotlib.axes import Axes
 from tqdm import tqdm
+
+plt.rcParams.update({
+    'text.usetex': True, 
+    'font.family': 'Helvetica', 
+})
 
 def main():
     fig = plt.figure(constrained_layout=True, figsize=(10, 5))
-    subfigs = fig.subfigures(1, 2)
+    subfigs = fig.subfigures(1, 2, width_ratios=(2, 3))
     for ((
         task_path_name, task_display, 
         (x_path, x_display), 
@@ -64,17 +71,19 @@ def main():
         n_cols = len(EXP_GROUPS)
         if task_path_name == 'decode':
             n_cols -= 1 # for SPICE
-        fig, axeses = subfig.subplots(len(DATA_SETS), n_cols)
+        axeses = subfig.subplots(len(DATA_SETS), n_cols)
         for row_i, ((set_path, set_display), axes) in enumerate(zip(
             DATA_SETS, axeses, 
         )):
             for col_i, (exp_group, ax) in tqdm([*enumerate(
                 zip(EXP_GROUPS, axes)
             )], f'{task_display} {set_display}'):
+                ax: Axes
                 # extract X, Y
                 data = {}
                 if exp_group is SPICE:
                     if set_path == 'train_set':
+                        ax.axis('off')
                         continue
                     with open(SPICE_PATH, 'r') as f:
                         for line in f:
@@ -108,16 +117,18 @@ def main():
                         data[instrument_name] = (X, Y)
                 # plot X, Y
                 for instrument_name, (X, Y) in data.items():
-                    ax.plot(X, Y, label=instrument_name, **plt_style)
-                if row_i == 0:
+                    ax.plot(
+                        X, Y, label=instrument_name, **plt_style, 
+                    )
+                if row_i == 0 or exp_group is SPICE:
                     ax.set_title(exp_group)
                 if row_i == 1:
                     ax.set_xlabel(x_display)
                 if col_i == 0:
                     ax.set_ylabel(set_display + '\n\n' + y_display)
-        # plt.legend()
         subfig.suptitle(task_display)
-    plt.tight_layout()
+    plt.legend(markerscale=8)
+    # plt.tight_layout()
     plt.show()
 
 if __name__ == '__main__':
