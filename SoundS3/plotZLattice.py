@@ -1,16 +1,7 @@
 import sys
 from os import path
 
-SPICE = 'SPICE'
-
-EXP_GROUPS = [
-    'vae_symm_4_repeat',
-    # 'vae_symm_4_repeat_timbre10d',
-    # 'ae_symm_4_repeat',
-    'vae_symm_0_repeat',
-    # 'vae_symm_4_no_repeat',
-    SPICE, 
-]
+from linearity_shared import *
 TASKS = [
     # path name, display name, x, y, plot style
     (
@@ -81,7 +72,7 @@ def main():
                 ax: Axes
                 # extract X, Y
                 data = {}
-                if exp_group is SPICE:
+                if exp_group[1] is SPICE:
                     if set_path == 'train_set':
                         ax.axis('off')
                         continue
@@ -100,7 +91,7 @@ def main():
                                 X.append(pitch)
                                 Y.append(z_pitch)
                 else:
-                    result_path = RESULT_PATH % (task_path_name, set_path, exp_group)
+                    result_path = RESULT_PATH % (task_path_name, set_path, exp_group[0])
                     for instrument_name in COMMON_INSTRUMENTS:
                         if instrument_name not in COMMON_INSTRUMENTS:
                             continue
@@ -120,8 +111,8 @@ def main():
                     ax.plot(
                         X, Y, label=instrument_name, **plt_style, 
                     )
-                if row_i == 0 or exp_group is SPICE:
-                    ax.set_title(exp_group)
+                if row_i == 0 or exp_group[0] is SPICE:
+                    ax.set_title(exp_group[1])
                 if row_i == 1:
                     ax.set_xlabel(x_display)
                 if col_i == 0:
