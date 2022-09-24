@@ -14,34 +14,6 @@ NECK_LINE_Y = .96
 import rc_params
 rc_params.init()
 from linearity_shared import *
-TASKS = [
-    # path name, display name, x, y, plot style
-    (
-        'decode', 'Synthesis', 
-        ('z_pitch', '$z_p$'), 
-        ('yin_pitch', 'Detected Pitch'),
-        dict(
-            linestyle='none', 
-            marker='.', 
-            markersize=1, 
-        ), 
-    ), 
-    (
-        'encode', 'Embedding', 
-        ('pitch', 'Pitch'), 
-        ('z_pitch', '$z_p$'),
-        dict(
-            linestyle='none', 
-            marker='.', 
-            markersize=1, 
-        ), 
-    ), 
-]
-DATA_SETS = [
-    # path name, display name
-    ('train_set', 'Training Set'), 
-    ('test_set', 'Test Set'), 
-]
 
 def main():
     fig = plt.figure(constrained_layout=True, figsize=FIGSIZE)
@@ -58,7 +30,7 @@ def main():
         if task_path_name == 'decode':
             n_cols -= 1 # for SPICE
         axeses = subfig.subplots(
-            len(DATA_SETS), n_cols, sharex=False, sharey=True,
+            len(DATA_SETS), n_cols, 
         )
         for row_i, ((set_path, set_display), axes) in enumerate(zip(
             DATA_SETS, axeses, 

@@ -1,5 +1,17 @@
 from os import path
 
+# USING_METRIC = 'R2'
+# METRIC_DISPLAY = dict(
+#     ylabel='$R^2$', 
+#     rotation=0,
+#     labelpad=10,
+# )
+
+USING_METRIC = 'diffStd'
+METRIC_DISPLAY = dict(
+    ylabel='Std of Diff', 
+)
+
 SPICE = 'SPICE'
 
 # EXP_GROUPS = [
@@ -19,6 +31,36 @@ EXP_GROUPS = [
     ('SPICE', SPICE), 
 ]
 
+TASKS = [
+    # path name, display name, x, y, plot style
+    (
+        'decode', 'Synthesis', 
+        ('z_pitch', '$z_p$'), 
+        ('yin_pitch', 'Detected Pitch'),
+        dict(
+            linestyle='none', 
+            marker='.', 
+            markersize=1, 
+        ), 
+    ), 
+    (
+        'encode', 'Embedding', 
+        ('pitch', 'Pitch'), 
+        ('z_pitch', '$z_p$'),
+        dict(
+            linestyle='none', 
+            marker='.', 
+            markersize=1, 
+        ), 
+    ), 
+]
+
+DATA_SETS = [
+    # path name, display name
+    ('train_set', 'Training Set'), 
+    ('test_set', 'Test Set'), 
+]
+
 RESULT_PATH = './linearityEvalResults/%s_%s_%s/'
 SPICE_PATH = './SPICE_results/result_short.txt'
 
@@ -35,6 +77,8 @@ def readXYFromDisk(
 ):
     data = {}
     if is_SPICE:
+        if 'decode' in result_path or 'train_set' in result_path:
+            raise NoSuchSpice
         with open(SPICE_PATH, 'r') as f:
             for line in f:
                 line: str = line.strip()
@@ -65,3 +109,5 @@ def readXYFromDisk(
             f(Y, y_path)
             data[instrument_name] = (X, Y)
     return data
+
+class NoSuchSpice(Exception): pass
