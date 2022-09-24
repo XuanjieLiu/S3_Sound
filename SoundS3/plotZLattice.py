@@ -9,7 +9,7 @@ EXP_GROUPS = [
     # 'ae_symm_4_repeat',
     'vae_symm_0_repeat',
     # 'vae_symm_4_no_repeat',
-    'SPICE', 
+    SPICE, 
 ]
 TASKS = [
     # path name, display name, x, y, plot style
@@ -53,13 +53,18 @@ from matplotlib import pyplot as plt
 from tqdm import tqdm
 
 def main():
-    for (
+    fig = plt.figure(constrained_layout=True, figsize=(10, 5))
+    subfigs = fig.subfigures(1, 2)
+    for ((
         task_path_name, task_display, 
         (x_path, x_display), 
         (y_path, y_display), 
         plt_style, 
-    ) in TASKS:
-        fig, axeses = plt.subplots(2, len(EXP_GROUPS))
+    ), subfig) in zip(TASKS, subfigs):
+        n_cols = len(EXP_GROUPS)
+        if task_path_name == 'decode':
+            n_cols -= 1 # for SPICE
+        fig, axeses = subfig.subplots(len(DATA_SETS), n_cols)
         for row_i, ((set_path, set_display), axes) in enumerate(zip(
             DATA_SETS, axeses, 
         )):
@@ -69,7 +74,7 @@ def main():
                 # extract X, Y
                 data = {}
                 if exp_group is SPICE:
-                    if task_path_name == 'decode' or set_path == 'train_set':
+                    if set_path == 'train_set':
                         continue
                     with open(SPICE_PATH, 'r') as f:
                         for line in f:
@@ -111,9 +116,9 @@ def main():
                 if col_i == 0:
                     ax.set_ylabel(set_display + '\n\n' + y_display)
         # plt.legend()
-        fig.suptitle(task_display)
-        plt.tight_layout()
-        plt.show()
+        subfig.suptitle(task_display)
+    plt.tight_layout()
+    plt.show()
 
 if __name__ == '__main__':
     main()
