@@ -53,5 +53,20 @@ def diffStd(X, Y, dt=1):
         print(diff_X)
     return diff_Y.std()
 
+def linearProjectionMSE(X, Y):
+    X = np.array(X, dtype=np.float32)
+    Y = np.array(Y, dtype=np.float32)
+    (
+        slope, intercept, r_value, p_value, std_err, 
+    ) = stats.linregress(X, Y)
+    Y_hat = X * slope + intercept
+    return ((Y - Y_hat) ** 2).mean()
+
+def linearProjectionStdErr(X, Y):
+    (
+        slope, intercept, r_value, p_value, std_err, 
+    ) = stats.linregress(X, Y)
+    return std_err
+
 if __name__ == '__main__':
     main()
