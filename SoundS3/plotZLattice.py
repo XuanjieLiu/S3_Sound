@@ -42,14 +42,6 @@ DATA_SETS = [
     ('train_set', 'Training Set'), 
     ('test_set', 'Test Set'), 
 ]
-RESULT_PATH = './linearityEvalResults/%s_%s_%s/'
-COMMON_INSTRUMENTS = [
-    'Piano', 'Accordion', 'Clarinet', 'Electric Piano', 
-    'Flute', 'Guitar', 'Saxophone', 'Trumpet', 'Violin', 
-    # 'Church Bells', 
-]
-
-SPICE_PATH = './SPICE_results/result_short.txt'
 
 def main():
     fig = plt.figure(constrained_layout=True, figsize=FIGSIZE)
@@ -75,42 +67,16 @@ def main():
                 zip(EXP_GROUPS, axes)
             )], f'{task_display} {set_display}'):
                 ax: Axes
-                # extract X, Y
-                data = {}
-                if exp_group[1] is SPICE:
+                is_spice = exp_group[1] == SPICE
+                if is_spice:
                     if set_path == 'train_set':
                         ax.axis('off')
                         continue
-                    with open(SPICE_PATH, 'r') as f:
-                        for neckLine in f:
-                            neckLine: str = neckLine.strip()
-                            neckLine = neckLine.split('single_note_GU_long/')[1]
-                            filename, z_pitch = neckLine.split('.wav ')
-                            z_pitch = float(z_pitch)
-                            instrument_name, pitch = filename.split('-')
-                            pitch = int(pitch)
-                            if instrument_name in COMMON_INSTRUMENTS:
-                                if instrument_name not in data:
-                                    data[instrument_name] = ([], [])
-                                X, Y = data[instrument_name]
-                                X.append(pitch)
-                                Y.append(z_pitch)
-                else:
-                    result_path = RESULT_PATH % (task_path_name, set_path, exp_group[1])
-                    for instrument_name in COMMON_INSTRUMENTS:
-                        if instrument_name not in COMMON_INSTRUMENTS:
-                            continue
-                        X = []
-                        Y = []
-                        def f(output: list, s: str):
-                            with open(path.join(
-                                result_path, instrument_name + f'_{s}.txt'
-                            ), 'r') as f:
-                                for line in f:
-                                    output.append(float(line.strip()))
-                        f(X, x_path)
-                        f(Y, y_path)
-                        data[instrument_name] = (X, Y)
+                # extract X, Y
+                result_path = RESULT_PATH % (task_path_name, set_path, exp_group[1])
+                data = readXYFromDisk(
+                    is_spice, result_path, x_path, y_path,
+                )
                 # plot X, Y
                 for instrument_name, (X, Y) in data.items():
                     if instrument_name not in plotted:
