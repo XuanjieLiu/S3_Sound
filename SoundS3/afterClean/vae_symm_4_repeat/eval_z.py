@@ -40,7 +40,7 @@ WAV_PATH_PRED_RECON = IMG_ROOT + "/pred_recon.wav"
 WAV_PATH_TRANSFORMED_SELF_RECON = IMG_ROOT + "/transformed_self_recon.wav"
 WAV_PATH_TRANSFORMED_PRED_RECON = IMG_ROOT + "/transformed_pred_recon.wav"
 DIY_WAVE_NAME = IMG_ROOT + "/diy_wave.wav"
-WAV_PATH = '../../../../makeSoundDatasets/datasets/cleanTrain/'
+WAV_PATH = '../../../../makeSoundDatasets/datasets/cleanTrain_GU/'
 device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
 MODEL_PATH = 'checkpoint_200000.pt'

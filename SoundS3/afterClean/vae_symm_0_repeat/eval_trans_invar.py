@@ -14,12 +14,13 @@ import torch
 from trainer_symmetry import save_spectrogram, tensor2spec, norm_log2, norm_log2_reverse, LOG_K
 import torchaudio.transforms as T
 import torchaudio
-from SoundS3.SoundDataLoader import SoundDataLoader
+from SoundS3.sound_dataset import Dataset, PersistentLoader, norm_log2
 import matplotlib
 from SoundS3.symmetry import rotation_x_mat, rotation_y_mat, rotation_z_mat, do_seq_symmetry, symm_rotate
 import numpy as np
+from SoundS3.shared import DEVICE
 
-WAV_PATH = '../datasets/raising_12_wav_SF-GS/'
+WAV_PATH = '../../../../makeSoundDatasets/datasets/cleanTrain_GU/'
 MODEL_PATH = 'Conv2dGruConv2d_symmetry.pt'
 PITCH_GRAPH_ROOT = 'Pitch_graphs'
 PITCH_STD_RECORD = 'pitch_std_record.txt'
@@ -115,30 +116,24 @@ def calc_k(pitch_dict: dict, p1, p2, graph_path, instru_list):
 
 class TransInvarTest:
     def __init__(self):
-        self.data_loader = SoundDataLoader(WAV_PATH, is_load_all_data_dict=False, time_frame_len=4)
+        self.dataset = Dataset(WAV_PATH)
         self.vae = init_vae()
         self.vae.eval()
 
     # Calculate global pitch std between pitch_1 and pitch_2
     def calc_global_pitch_std(self, pitch_1, pitch_2):
-        data_num = len(self.data_loader.f_list)
+        data_num = len(self.dataset)
         print(f"There are {data_num} files")
         print(f"============loading {data_num} data=============")
         pitch_dict = {}
         pitch_list = []
-        for i in range(0, data_num):
-            if i % 20 == 0:
-                print(f'Process: {i} / {data_num}, {int(i / data_num * 100)}%')
-            wav_path = self.data_loader.data_path + self.data_loader.f_list[i]
-            data_tuple = self.data_loader.load_a_audio_spec_from_disk(wav_path)
+        for instrument_name, start_pitch, data_tuple in self.dataset.data:
             data = torch.stack([data_tuple], dim=0).to(DEVICE)
             data = norm_log2(data, k=LOG_K)
             z, mu, logvar = self.vae.batch_seq_encode_to_z(data)
             pitch_seq = mu[0, 0:7, 0].detach()
             pitch_list.append(pitch_seq[0])
 
-            instrument_name = self.data_loader.f_list[i].split('-')[0]
-            start_pitch = self.data_loader.f_list[i].split('.')[0].split('-')[1]
             if instrument_name not in pitch_dict:
                 pitch_dict[instrument_name] = {}
             pitch_dict[instrument_name][start_pitch] = pitch_seq
