@@ -36,16 +36,16 @@ SPICE = 'SPICE'
 
 EXP_GROUPS = [
     # display name, path name
-    ('With Symmetry', 'vae_symm_4_repeat'), 
-    ('No Symmetry', 'vae_symm_0_repeat'), 
-    ('SPICE', SPICE), 
+    ('w/ Symmetry', 'vae_symm_4_repeat'), 
+    ('w/o Symmetry', 'vae_symm_0_repeat'), 
+    # ('SPICE', SPICE), 
 ]
 
 TASKS = [
     # path name, display name, x, y, plot style
     (
         'decode', 'Synthesis', 
-        ('z_pitch', '$z_p$'), 
+        ('z_pitch', '$z_\\mathrm{pitch}$'), 
         ('yin_pitch', 'Detected Pitch'),
         dict(
             linestyle='none', 
@@ -56,7 +56,7 @@ TASKS = [
     (
         'encode', 'Embedding', 
         ('pitch', 'Pitch'), 
-        ('z_pitch', '$z_p$'),
+        ('z_pitch', '$z_\\mathrm{pitch}$'),
         dict(
             linestyle='none', 
             marker='.', 
@@ -67,8 +67,8 @@ TASKS = [
 
 DATA_SETS = [
     # path name, display name
-    ('train_set', 'Training Set'), 
-    ('test_set', 'Test Set'), 
+    ('train_set', 'Train'), 
+    ('test_set', 'Test'), 
 ]
 
 RESULT_PATH = './linearityEvalResults/%s_%s_%s/'

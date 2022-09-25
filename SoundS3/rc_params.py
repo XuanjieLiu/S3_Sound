@@ -5,4 +5,5 @@ def init():
         'text.usetex': True, 
         'font.family': 'serif', 
         'font.serif': ['Computer Modern'], 
+        'font.size': 14, 
     })
