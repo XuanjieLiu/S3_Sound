@@ -7,7 +7,7 @@ from matplotlib.figure import SubFigure
 from tqdm import tqdm
 
 FIGSIZE = (11, 5)
-WIDTH_RATIO = (.04, .37, .01, .4, .2)
+WIDTH_RATIO = (.04, .4, .01, .38, .2)
 NECK_LINE_Y = .95
 
 import rc_params
@@ -82,7 +82,7 @@ def main():
                             size='large',
                             rotation=90, 
                         )
-                if subfig_i == 0:
+                if task_path_name == 'decode':
                     ax.set_yticks((36, 60, 84))
                     ax.set_yticklabels(('C2', 'C4', 'C6'))
                 else:
