@@ -36,8 +36,8 @@ SPICE = 'SPICE'
 
 EXP_GROUPS = [
     # display name, path name
-    ('w/ Symmetry', 'vae_symm_4_repeat'), 
-    ('w/o Symmetry', 'vae_symm_0_repeat'), 
+    ('Ours', 'vae_symm_4_repeat'), 
+    ('Ours, w/o Symmetry', 'vae_symm_0_repeat'), 
     # ('SPICE', SPICE), 
 ]
 
