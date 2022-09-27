@@ -38,6 +38,10 @@ def main():
         for row_i, ((set_path, set_display), axes) in enumerate(zip(
             DATA_SETS, axeses, 
         )):
+            try:
+                axes[0]
+            except TypeError:
+                axes = [axes]
             for col_i, (exp_group, ax) in tqdm([*enumerate(
                 zip(EXP_GROUPS, axes)
             )], f'{task_display} {set_display}'):
