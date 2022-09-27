@@ -18,6 +18,7 @@ import rc_params
 rc_params.init()
 from linearity_shared import *
 
+FIGSIZE = (14, 5)
 EXP_LOOKUP = dict([(y, x) for x, y in EXP_GROUPS])
 
 def main():
@@ -74,46 +75,43 @@ def table(data):
                     ))
 
 def plot(data):
-    fig, axes = plt.subplots(len(TASKS), 1)
+    fig = plt.figure(figsize=FIGSIZE)
+    axes = fig.subplots(len(TASKS), 1)
     sBars = [SmartBar() for _ in TASKS]
-    for set_path, (set_display, data_s) in reversed(data.items()):
-        for ax_i, (task_path, (task_display, data_st)) in enumerate(
-            data_s.items()
-        ):
-            if set_path == 'train_set':
-                set_kw = dict(hatch='xxxx')
-            else:
-                set_kw = dict()
-            for exp_path, (exp_display, data_tse) in data_st.items():
-                if exp_path == 'vae_symm_4_repeat':
-                    exp_kw = dict(
-                        facecolor='k', 
-                        edgecolor='gray', 
-                    )
-                elif exp_path == 'vae_symm_0_repeat':
-                    exp_kw = dict(
-                        facecolor='w', 
-                        edgecolor='gray', 
-                    )
-                elif exp_path is SPICE:
-                    exp_kw = dict(
-                        facecolor='b', 
-                        edgecolor='gray', 
-                        hatch='OO', 
-                    )
-                def f():
-                    values = []
-                    for instrument_name in COMMON_INSTRUMENTS:
-                        try:
-                            values.append(data_tse[instrument_name])
-                        except KeyError:
-                            return
-                    print(exp_display, set_display)
-                    sBars[ax_i].addGroup(
-                        values, f'{exp_display}, {set_display}', 
-                        **exp_kw, **set_kw, 
-                    )
-                f()
+    set_path, (set_display, data_s) = [*data.items()][1]
+    for ax_i, (task_path, (task_display, data_st)) in enumerate(
+        data_s.items()
+    ):
+        for exp_path, (exp_display, data_tse) in data_st.items():
+            if exp_path == 'vae_symm_4_repeat':
+                exp_kw = dict(
+                    facecolor='k', 
+                    edgecolor='k', 
+                )
+            elif exp_path is SPICE:
+                exp_kw = dict(
+                    facecolor='w', 
+                    edgecolor='k', 
+                )
+            elif exp_path == 'beta_vae':
+                exp_kw = dict(
+                    facecolor='w', 
+                    edgecolor='k', 
+                    hatch='xxxx', 
+                )
+            def f():
+                values = []
+                for instrument_name in COMMON_INSTRUMENTS:
+                    try:
+                        values.append(data_tse[instrument_name])
+                    except KeyError:
+                        return
+                print(exp_display, set_display)
+                sBars[ax_i].addGroup(
+                    values, f'{exp_display}', 
+                    **exp_kw, 
+                )
+            f()
     for ax_i, (task_path, (task_display, data_st)) in enumerate(
         data_s.items()
     ):
@@ -122,12 +120,15 @@ def plot(data):
         sBars[ax_i].draw(ax)
         ax.set_title(task_display)
         ax.set_xticklabels(
-            ax.get_xticklabels(), rotation=20, ha='right', 
+            ax.get_xticklabels(), rotation=-90, 
         )
         ax.set_ylabel(**METRIC_DISPLAY)
-    axes[1].legend(
-        ncol = 2, 
-        loc='upper right', bbox_to_anchor=(.97, -.45), 
+        ax.yaxis.set_label_coords(-.4, .3)
+        if USING_METRIC == 'R2':
+            ax.set_ylim([0, 1])
+    axes[0].legend(
+        ncol = 1, 
+        loc='center left', bbox_to_anchor=(1, 0), 
     )
 
     fig.tight_layout()
