@@ -18,7 +18,7 @@ import rc_params
 rc_params.init()
 from linearity_shared import *
 
-FIGSIZE = (14, 5)
+FIGSIZE = (5, 3)
 EXP_LOOKUP = dict([(y, x) for x, y in EXP_GROUPS])
 
 def main():
@@ -77,6 +77,8 @@ def table(data):
 def plot(data):
     fig = plt.figure(figsize=FIGSIZE)
     axes = fig.subplots(len(TASKS), 1)
+    if len(TASKS) == 1:
+        axes = [axes]
     sBars = [SmartBar() for _ in TASKS]
     set_path, (set_display, data_s) = [*data.items()][1]
     for ax_i, (task_path, (task_display, data_st)) in enumerate(
@@ -118,20 +120,28 @@ def plot(data):
         ax = axes[ax_i]
         sBars[ax_i].setXTicks(COMMON_INSTRUMENTS)
         sBars[ax_i].draw(ax)
-        ax.set_title(task_display)
+        if len(TASKS) > 1:
+            ax.set_title(task_display)
         ax.set_xticklabels(
             ax.get_xticklabels(), rotation=-90, 
         )
         ax.set_ylabel(**METRIC_DISPLAY)
-        ax.yaxis.set_label_coords(-.05, .3)
+        # ax.yaxis.set_label_coords(-.05, .3)
         if USING_METRIC == 'R2':
-            ax.set_ylim([0, 1])
+            ax.set_ylim([0, 1.1])
     axes[0].legend(
-        ncol = 1, 
-        loc='center left', bbox_to_anchor=(1, 0), 
+        ncol = 2, 
+        # loc='center left', bbox_to_anchor=(1, .5), 
+        loc='lower center', bbox_to_anchor=(.5, 1), 
     )
 
     fig.tight_layout()
+    plt.subplots_adjust(
+        top=0.830, 
+        bottom=0.450,
+        left=0.110, 
+        right=0.980,
+    )
     plt.show()
 
 main()

@@ -4,7 +4,7 @@ USING_METRIC = 'R2'
 METRIC_DISPLAY = dict(
     ylabel='$R^2$', 
     rotation=0,
-    labelpad=10,
+    labelpad=15,
 )
 
 # USING_METRIC = 'diffStd'
@@ -38,7 +38,7 @@ EXP_GROUPS = [
     # display name, path name
     ('Ours', 'vae_symm_4_repeat'), 
     # ('Ours w/o Symmetry', 'vae_symm_0_repeat'), 
-    ('$\\beta$-VAE', 'beta_vae'), 
+    # ('$\\beta$-VAE', 'beta_vae'), 
     ('SPICE', SPICE), 
 ]
 
@@ -54,16 +54,16 @@ TASKS = [
             markersize=1, 
         ), 
     ), 
-    (
-        'decode', 'Synthesis', 
-        ('z_pitch', '$z_\\mathrm{pitch}$'), 
-        ('yin_pitch', 'Detected Pitch'),
-        dict(
-            linestyle='none', 
-            marker='.', 
-            markersize=1, 
-        ), 
-    ), 
+    # (
+    #     'decode', 'Synthesis', 
+    #     ('z_pitch', '$z_\\mathrm{pitch}$'), 
+    #     ('yin_pitch', 'Detected Pitch'),
+    #     dict(
+    #         linestyle='none', 
+    #         marker='.', 
+    #         markersize=1, 
+    #     ), 
+    # ), 
 ]
 
 DATA_SETS = [
