@@ -38,16 +38,16 @@ EXP_GROUPS = [
     # display name, path name
     ('Ours', 'vae_symm_4_repeat'), 
     ('Ours, w/o Symmetry', 'vae_symm_0_repeat'), 
-    # ('$\\beta$-VAE', 'beta_vae'), 
-    # ('SPICE', SPICE), 
+    ('$\\beta$-VAE', 'beta_vae'), 
+    ('SPICE', SPICE), 
 ]
 
 TASKS = [
     # path name, display name, x, y, plot style
     (
-        'encode', 'Embedding', 
-        ('pitch', 'Pitch'), 
-        ('z_pitch', '$z_\\mathrm{pitch}$'),
+        'decode', 'Synthesis', 
+        ('z_pitch', '$z_\\mathrm{pitch}$'), 
+        ('yin_pitch', 'Detected Pitch'),
         dict(
             linestyle='none', 
             marker='.', 
@@ -55,9 +55,9 @@ TASKS = [
         ), 
     ), 
     (
-        'decode', 'Synthesis', 
-        ('z_pitch', '$z_\\mathrm{pitch}$'), 
-        ('yin_pitch', 'Detected Pitch'),
+        'encode', 'Embedding', 
+        ('pitch', 'Pitch'), 
+        ('z_pitch', '$z_\\mathrm{pitch}$'),
         dict(
             linestyle='none', 
             marker='.', 
