@@ -123,7 +123,7 @@ def plot(data):
             ax.get_xticklabels(), rotation=-90, 
         )
         ax.set_ylabel(**METRIC_DISPLAY)
-        ax.yaxis.set_label_coords(-.4, .3)
+        ax.yaxis.set_label_coords(-.05, .3)
         if USING_METRIC == 'R2':
             ax.set_ylim([0, 1])
     axes[0].legend(
