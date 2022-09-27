@@ -37,9 +37,9 @@ SPICE = 'SPICE'
 EXP_GROUPS = [
     # display name, path name
     ('Ours', 'vae_symm_4_repeat'), 
-    # ('Ours w/o Symmetry', 'vae_symm_0_repeat'), 
+    ('Ours, w/o Symmetry', 'vae_symm_0_repeat'), 
     # ('$\\beta$-VAE', 'beta_vae'), 
-    ('SPICE', SPICE), 
+    # ('SPICE', SPICE), 
 ]
 
 TASKS = [
@@ -54,16 +54,16 @@ TASKS = [
             markersize=1, 
         ), 
     ), 
-    # (
-    #     'decode', 'Synthesis', 
-    #     ('z_pitch', '$z_\\mathrm{pitch}$'), 
-    #     ('yin_pitch', 'Detected Pitch'),
-    #     dict(
-    #         linestyle='none', 
-    #         marker='.', 
-    #         markersize=1, 
-    #     ), 
-    # ), 
+    (
+        'decode', 'Synthesis', 
+        ('z_pitch', '$z_\\mathrm{pitch}$'), 
+        ('yin_pitch', 'Detected Pitch'),
+        dict(
+            linestyle='none', 
+            marker='.', 
+            markersize=1, 
+        ), 
+    ), 
 ]
 
 DATA_SETS = [
