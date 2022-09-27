@@ -1,16 +1,16 @@
 from os import path
 
-# USING_METRIC = 'R2'
-# METRIC_DISPLAY = dict(
-#     ylabel='$R^2$', 
-#     rotation=0,
-#     labelpad=10,
-# )
-
-USING_METRIC = 'diffStd'
+USING_METRIC = 'R2'
 METRIC_DISPLAY = dict(
-    ylabel='Std of Diff', 
+    ylabel='$R^2$', 
+    rotation=0,
+    labelpad=10,
 )
+
+# USING_METRIC = 'diffStd'
+# METRIC_DISPLAY = dict(
+#     ylabel='Std of Diff', 
+# )
 
 # USING_METRIC = 'linearProjectionMSE'
 # METRIC_DISPLAY = dict(
@@ -37,8 +37,9 @@ SPICE = 'SPICE'
 EXP_GROUPS = [
     # display name, path name
     ('Ours', 'vae_symm_4_repeat'), 
-    ('Ours, w/o Symmetry', 'vae_symm_0_repeat'), 
-    # ('SPICE', SPICE), 
+    # ('Ours w/o Symmetry', 'vae_symm_0_repeat'), 
+    ('$\\beta$-VAE', 'beta_vae'), 
+    ('SPICE', SPICE), 
 ]
 
 TASKS = [

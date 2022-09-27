@@ -26,6 +26,7 @@ class Dataset(torch.utils.data.Dataset):
         self, dataset_path, debug_ifft=False, 
         cache_all=True, 
     ):
+        super().__init__()
         self.dataset_path = dataset_path
         with open(path.join(dataset_path, 'index.pickle'), 'rb') as f:
             self.index: List[Tuple[str, int]] = pickle.load(f)
