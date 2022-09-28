@@ -59,7 +59,16 @@ def loadData():
                         data_ste[instrument_name] = value
     return data
 
-def table(data):
+# def table(data):
+#     set_path = 'test_set'
+#     set_display, data_s = data[set_path]
+#     for _, (task_display, data_st) in data_s.items():
+#         for _, (exp_display, data_ste) in data_st.items():
+#             if len(data_ste):
+#                 for instrument_name, value in data_ste.items():
+#                     ...
+
+def meanAcrossInstruments(data):
     for set_path, (set_display, data_s) in data.items():
         print(set_display)
         for _, (task_display, data_st) in data_s.items():
