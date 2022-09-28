@@ -8,7 +8,7 @@ from tqdm import tqdm
 
 FIGSIZE = (11, 5)
 WIDTH_RATIO = (.04, .4, .01, .38, .2)
-NECK_LINE_Y = .95
+NECK_LINE_Y = .94
 
 import rc_params
 rc_params.init()
@@ -22,7 +22,7 @@ def main():
     subfig_0_ax = subfigs[0].subplots()
     subfig_0_ax.axis('off')
     plotted: Dict[str, List[Line2D]] = {}
-    for subfig_i, ((
+    for task_i, ((
         task_path_name, task_display, 
         (x_path, x_display), 
         (y_path, y_display), 
@@ -38,6 +38,10 @@ def main():
         for row_i, ((set_path, set_display), axes) in enumerate(zip(
             DATA_SETS, axeses, 
         )):
+            try:
+                axes[0]
+            except TypeError:
+                axes = [axes]
             for col_i, (exp_group, ax) in tqdm([*enumerate(
                 zip(EXP_GROUPS, axes)
             )], f'{task_display} {set_display}'):
@@ -61,7 +65,7 @@ def main():
                     )[0])
                 ax.set_title(' ')
                 if row_i == 0 or exp_group[1] is SPICE:
-                    ax.set_title(exp_group[0].replace(', ', '\n'))
+                    ax.set_title(exp_group[0].replace(', ', ',\n'))
                 if row_i == 1:
                     ax.set_xlabel(x_display)
                 if col_i == 0:
@@ -71,7 +75,7 @@ def main():
                     else:
                         kw = dict()
                     ax.set_ylabel(y_display, **kw)
-                    if subfig_i == 0:
+                    if task_i == 0:
                         subfig_0_ax.annotate(
                             '\\textbf{%s}' % set_display, 
                             xy=(0, 0.5), 
@@ -88,7 +92,11 @@ def main():
                 else:
                     ax.set_xticks((36, 60, 84))
                     ax.set_xticklabels(('C2', 'C4', 'C6'))
-        subfig.suptitle('\\raisebox{.2ex}{\\textbf{%s}}' % task_display)
+        subfig.suptitle(
+            '\\raisebox{.2ex}{\\textbf{(%s) %s}}' % (
+                'ab'[task_i], task_display, 
+            ), 
+        )
         neckLine = Line2D(
             [0, 1], [NECK_LINE_Y], color='k', linewidth=1.5, 
         )
