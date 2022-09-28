@@ -147,8 +147,8 @@ def plot(data):
         if USING_METRIC == 'R2':
             ax.set_ylim([0, 1.1])
     axes[0].legend(
-        ncol = 4, 
-        # loc='center left', bbox_to_anchor=(1, .5), 
+        ncol = 3, 
+        # loc='center left', bbox_to_anchor=(1, 0), 
         loc='upper center', bbox_to_anchor=(.5, 0), 
     )
 
@@ -162,6 +162,8 @@ def plot(data):
     # )
     plt.subplots_adjust(
         hspace=.6,
+        top=.95, 
+        bottom=.222,
     )
     plt.show()
 

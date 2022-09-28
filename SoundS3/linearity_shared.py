@@ -36,10 +36,10 @@ SPICE = 'SPICE'
 
 EXP_GROUPS = [
     # display name, path name
-    ('Ours', 'vae_symm_4_repeat'), 
-    ('Ours, w/o Symmetry', 'vae_symm_0_repeat'), 
-    ('$\\beta$-VAE', 'beta_vae'), 
-    ('SPICE', SPICE), 
+    ('SPS (Ours)', 'vae_symm_4_repeat'), 
+    ('Ours w/o Symmetry', 'vae_symm_0_repeat'), 
+    ('$\\beta$-VAE (Baseline)', 'beta_vae'), 
+    ('SPICE (Baseline)', SPICE), 
 ]
 
 TASKS = [
