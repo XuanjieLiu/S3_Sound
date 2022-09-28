@@ -2,6 +2,7 @@ import math
 
 CONFIG = {
     'train_data_path': '../../../../makeSoundDatasets/datasets/cleanTrainBanjo',
+    'eval_data_path': '../../../../makeSoundDatasets/datasets/cleanTrain_GU',
     'latent_code_num': 1,
     't_batch_multiple': 4,
     'r_batch_multiple': 256,

@@ -3,6 +3,8 @@ import torch
 import numpy
 import random
 
+from SoundS3.shared import DEVICE
+
 
 def create_path_if_not_exist(path):
     if not os.path.exists(path):
