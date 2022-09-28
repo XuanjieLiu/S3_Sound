@@ -137,10 +137,10 @@ def plot(data):
         # ax.yaxis.set_label_coords(-.05, .3)
         if USING_METRIC == 'R2':
             ax.set_ylim([0, 1.1])
-    axes[1].legend(
+    axes[0].legend(
         ncol = 4, 
         # loc='center left', bbox_to_anchor=(1, .5), 
-        loc='lower center', bbox_to_anchor=(.5, 1.2), 
+        loc='upper center', bbox_to_anchor=(.5, 0), 
     )
 
     fig.tight_layout()
