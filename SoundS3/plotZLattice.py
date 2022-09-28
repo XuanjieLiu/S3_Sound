@@ -74,7 +74,7 @@ def main():
                 ax.set_xticks((36, 60, 84))
                 ax.set_xticklabels(('C2', 'C4', 'C6'))
     def prettify(k):
-        return k.replace('Electric ', 'E-')
+        return k.replace('Electric ', 'E. ')
     K, V = [], []
     for k in sorted(
         plotted.keys(), reverse=True, 
@@ -83,10 +83,10 @@ def main():
         K.append(prettify(k))
         V.append(plotted[k][0])
     
-    axeses[0][3].legend(
+    axeses[1][3].legend(
         V, K, markerscale=8, 
-        loc='lower left', 
-        bbox_to_anchor=(-.05, -.05), 
+        loc='upper left', 
+        bbox_to_anchor=(-.05, 1.05), 
         # fontsize=10, 
         labelspacing=1, 
         ncols=2,
