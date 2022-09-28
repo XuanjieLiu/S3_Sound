@@ -45,9 +45,9 @@ EXP_GROUPS = [
 TASKS = [
     # path name, display name, x, y, plot style
     (
-        'decode', 'Synthesis', 
-        ('z_pitch', '$z_\\mathrm{pitch}$'), 
-        ('yin_pitch', 'Detected Pitch'),
+        'encode', 'Embedding', 
+        ('pitch', 'Pitch'), 
+        ('z_pitch', '$z_\\mathrm{pitch}$'),
         dict(
             linestyle='none', 
             marker='.', 
@@ -55,9 +55,9 @@ TASKS = [
         ), 
     ), 
     (
-        'encode', 'Embedding', 
-        ('pitch', 'Pitch'), 
-        ('z_pitch', '$z_\\mathrm{pitch}$'),
+        'decode', 'Synthesis', 
+        ('z_pitch', '$z_\\mathrm{pitch}$'), 
+        ('yin_pitch', 'Detected Pitch'),
         dict(
             linestyle='none', 
             marker='.', 
@@ -68,7 +68,7 @@ TASKS = [
 
 DATA_SETS = [
     # path name, display name
-    ('train_set', 'Train'), 
+    # ('train_set', 'Train'), 
     ('test_set', 'Test'), 
 ]
 
