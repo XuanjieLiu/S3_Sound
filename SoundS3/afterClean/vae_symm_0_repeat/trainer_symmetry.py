@@ -33,6 +33,8 @@ time_frame_len = 4
 DT_BATCH_MULTIPLE = 4
 LAST_SOUND = 15
 
+MAX_EVAL_ITER = 75
+
 
 def tensor_arrange(num, start, end, is_have_end):
     if is_have_end:
@@ -88,10 +90,16 @@ def symm_rotate_first3dim(z, rotator):
 class BallTrainer:
     def __init__(self, config, is_train=True):
         self.model = Conv2dGruConv2d(config).to(DEVICE)
-        self.dataset = Dataset(config['train_data_path'])
-        self.train_data_loader = PersistentLoader(
-            self.dataset, BATCH_SIZE, 
-        )
+        if is_train:
+            self.dataset = Dataset(config['train_data_path'])
+            self.train_data_loader = PersistentLoader(
+                self.dataset, BATCH_SIZE,
+            )
+        else:
+            self.eval_dataset = Dataset(config['eval_data_path'])
+            self.eval_data_loader = PersistentLoader(
+                self.eval_dataset, BATCH_SIZE,
+            )
         self.mse_loss = nn.MSELoss(reduction='sum').to(DEVICE)
         self.model.to(DEVICE)
         self.model_path = config['model_path']
@@ -276,3 +284,54 @@ class BallTrainer:
                                  KLD.item()
                                  ])
         return loss
+
+    def eval(self, epoch_num, iter_num, eval_loss_counter, eval_record_path=None):
+        print("=====================start eval=======================")
+        self.model.eval()
+        z_gt_s_list = []
+        z0_rnn_list = []
+        vae_loss_list = []
+        rnn_recon_loss_list = []
+        data_shape = None
+        for i in range(MAX_EVAL_ITER):
+            data = next(self.eval_data_loader).to(DEVICE)
+            print(f'{i}')
+            data = norm_log2(data, k=LOG_K)
+            data = data.cuda()
+            data_shape = data.size()
+            z_gt, mu, logvar = self.model.batch_seq_encode_to_z(data)
+            z_gt_p = mu[..., 0:1]
+            z_gt_c = mu[..., 1:]
+            sample_points = list(range(mu.size(1)))[self.base_len:]
+            z0_rnn = self.model.predict_with_symmetry(z_gt_p, sample_points, lambda z: z)
+            rnn_recon_loss = self.calc_rnn_loss(data[:, 1:, :, :, :], z_gt_p, z0_rnn, 1, z_gt_c[:, :-1, :])[0].item()
+            vae_loss = self.calc_vae_loss(data, mu, mu, logvar)[0].item()
+            z_gt_s_list.append(z_gt_p.detach())
+            z0_rnn_list.append(z0_rnn.detach())
+            vae_loss_list.append(vae_loss)
+            rnn_recon_loss_list.append(rnn_recon_loss)
+        self.model.train()
+        tensor_z_gt = torch.stack(z_gt_s_list)
+        tensor_z0_Rnn = torch.stack(z0_rnn_list)
+        norm_z_gt, mean_z_gt, std_z_gt = vector_z_score_norm(tensor_z_gt)
+        norm_z0_Rnn, mean_z0_Rnn, std_z0_Rnn = vector_z_score_norm(tensor_z0_Rnn, mean_z_gt, std_z_gt)
+        rnn_z_loss = nn.MSELoss()(norm_z0_Rnn, norm_z_gt[:, :, 1:, :]).item()
+        vae_recon_loss_iter_mean = np.mean(vae_loss_list) / data_shape[1] * (data_shape[1] - 1)
+        rnn_recon_loss_iter_mean = np.mean(rnn_recon_loss_list)
+        vae_recon_loss_pixel_mean = vae_recon_loss_iter_mean / data_shape[0] / (data_shape[1] - 1) / data_shape[2] / \
+                                    data_shape[3] / data_shape[4]
+        rnn_recon_loss_pixel_mean = rnn_recon_loss_iter_mean / data_shape[0] / (data_shape[1] - 1) / data_shape[2] / \
+                                    data_shape[3] / data_shape[4]
+        eval_loss_counter.add_values([vae_recon_loss_iter_mean, rnn_recon_loss_iter_mean,
+                                      vae_recon_loss_pixel_mean, rnn_recon_loss_pixel_mean, rnn_z_loss])
+        eval_loss_counter.record_and_clear(
+            eval_record_path if eval_record_path is not None else self.eval_record_path,
+            iter_num, round_idx=4
+        )
+        print("=====================end eval=======================")
+
+    def eval_a_checkpoint(self, checkpoint_num, checkpoint_path, record_name):
+        eval_loss_counter = LossCounter(['loss_ED', 'loss_ERnnD', 'loss_ED_mean', 'loss_ERnnD_mean', 'loss_Rnn_norm'])
+        self.model.load_state_dict(self.model.load_tensor(checkpoint_path))
+        self.eval(0, checkpoint_num, eval_loss_counter, eval_record_path=record_name)
+
