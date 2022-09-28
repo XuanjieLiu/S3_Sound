@@ -23,7 +23,7 @@ EXP_LOOKUP = dict([(y, x) for x, y in EXP_GROUPS])
 
 def main():
     data = loadData()
-    table(data)
+    meanAcrossInstruments(data)
     input('Press Enter...')
     print('Plot!')
     plot(data)
