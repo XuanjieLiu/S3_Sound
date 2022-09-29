@@ -18,7 +18,7 @@ import rc_params
 rc_params.init()
 from linearity_shared import *
 
-FIGSIZE = (5, 3)
+FIGSIZE = (8, 6)
 EXP_LOOKUP = dict([(y, x) for x, y in EXP_GROUPS])
 
 def main():
@@ -85,11 +85,12 @@ def meanAcrossInstruments(data):
 
 def plot(data):
     fig = plt.figure(figsize=FIGSIZE)
-    axes = fig.subplots(len(TASKS), 1)
+    axes = fig.subplots(len(TASKS), 1, sharex=True)
     if len(TASKS) == 1:
         axes = [axes]
     sBars = [SmartBar() for _ in TASKS]
-    set_path, (set_display, data_s) = [*data.items()][1]
+    set_path = 'test_set'
+    set_display, data_s = data[set_path]
     for ax_i, (task_path, (task_display, data_st)) in enumerate(
         data_s.items()
     ):
@@ -99,16 +100,23 @@ def plot(data):
                     facecolor='k', 
                     edgecolor='k', 
                 )
-            elif exp_path is SPICE:
+            elif exp_path == 'vae_symm_0_repeat':
                 exp_kw = dict(
                     facecolor='w', 
                     edgecolor='k', 
+                    hatch='+++', 
                 )
             elif exp_path == 'beta_vae':
                 exp_kw = dict(
                     facecolor='w', 
                     edgecolor='k', 
-                    hatch='xxxx', 
+                    hatch='xxx', 
+                )
+            elif exp_path is SPICE:
+                exp_kw = dict(
+                    facecolor='w', 
+                    edgecolor='k', 
+                    hatch='OO', 
                 )
             def f():
                 values = []
@@ -139,17 +147,23 @@ def plot(data):
         if USING_METRIC == 'R2':
             ax.set_ylim([0, 1.1])
     axes[0].legend(
-        ncol = 2, 
-        # loc='center left', bbox_to_anchor=(1, .5), 
-        loc='lower center', bbox_to_anchor=(.5, 1), 
+        ncol = 3, 
+        # loc='center left', bbox_to_anchor=(1, 0), 
+        loc='upper center', bbox_to_anchor=(.5, 0), 
     )
 
     fig.tight_layout()
+    # plt.subplots_adjust(
+    #     top=0.90, 
+    #     bottom=0.20,
+    #     left=0.110, 
+    #     right=0.980,
+    #     hspace=.6,
+    # )
     plt.subplots_adjust(
-        top=0.830, 
-        bottom=0.450,
-        left=0.110, 
-        right=0.980,
+        hspace=.6,
+        top=.95, 
+        bottom=.222,
     )
     plt.show()
 
