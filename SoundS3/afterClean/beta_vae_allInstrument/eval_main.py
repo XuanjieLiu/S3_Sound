@@ -1,7 +1,7 @@
 from train_config import CONFIG
 from trainer_symmetry import BallTrainer, is_need_train
 
-CHECK_POINT_PATH = 'checkpoint_200000.pt'
+CHECK_POINT_PATH = 'checkpoint_60000.pt'
 CHECK_POINT_NUM = int(CHECK_POINT_PATH.split('.')[0].split('_')[-1])
 EVAL_NAME = f'eval_{CHECK_POINT_NUM}.txt'
 

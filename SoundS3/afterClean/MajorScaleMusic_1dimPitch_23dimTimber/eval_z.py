@@ -250,47 +250,47 @@ class TestUI:
 
         self.init_scale_list(scale_bars_frame)
 
-        self_scale2_label = Label(scale_bars_frame, text="rot around d1")
-        self_scale2_label.grid(row=0, column=CODE_LEN)
-        scale_2 = Scale(
-            scale_bars_frame,
-            variable=self.scale_var_2,
-            command=lambda value: self.common_on_scale_move(),
-            from_=-3.1,
-            to=3.2,
-            resolution=0.1,
-            length=600,
-            tickinterval=TICK_INTERVAL
-        )
-        scale_2.grid(row=1, column=CODE_LEN, rowspan=5, padx=(0, 20))
-
-        self_scale3_label = Label(scale_bars_frame, text="rot around d2")
-        self_scale3_label.grid(row=0, column=CODE_LEN + 1)
-        scale_3 = Scale(
-            scale_bars_frame,
-            variable=self.scale_var_3,
-            command=lambda value: self.common_on_scale_move(),
-            from_=-3.1,
-            to=3.2,
-            resolution=0.1,
-            length=600,
-            tickinterval=TICK_INTERVAL
-        )
-        scale_3.grid(row=1, column=CODE_LEN + 1, rowspan=5, padx=(0, 20))
-
-        self_scale4_label = Label(scale_bars_frame, text="rot around d3")
-        self_scale4_label.grid(row=0, column=CODE_LEN + 2)
-        scale_4 = Scale(
-            scale_bars_frame,
-            variable=self.scale_var_4,
-            command=lambda value: self.common_on_scale_move(),
-            from_=-3.1,
-            to=3.2,
-            resolution=0.1,
-            length=600,
-            tickinterval=TICK_INTERVAL
-        )
-        scale_4.grid(row=1, column=CODE_LEN + 2, rowspan=5, padx=(0, 20))
+        # self_scale2_label = Label(scale_bars_frame, text="rot around d1")
+        # self_scale2_label.grid(row=0, column=CODE_LEN)
+        # scale_2 = Scale(
+        #     scale_bars_frame,
+        #     variable=self.scale_var_2,
+        #     command=lambda value: self.common_on_scale_move(),
+        #     from_=-3.1,
+        #     to=3.2,
+        #     resolution=0.1,
+        #     length=600,
+        #     tickinterval=TICK_INTERVAL
+        # )
+        # scale_2.grid(row=1, column=CODE_LEN, rowspan=5, padx=(0, 20))
+        #
+        # self_scale3_label = Label(scale_bars_frame, text="rot around d2")
+        # self_scale3_label.grid(row=0, column=CODE_LEN + 1)
+        # scale_3 = Scale(
+        #     scale_bars_frame,
+        #     variable=self.scale_var_3,
+        #     command=lambda value: self.common_on_scale_move(),
+        #     from_=-3.1,
+        #     to=3.2,
+        #     resolution=0.1,
+        #     length=600,
+        #     tickinterval=TICK_INTERVAL
+        # )
+        # scale_3.grid(row=1, column=CODE_LEN + 1, rowspan=5, padx=(0, 20))
+        #
+        # self_scale4_label = Label(scale_bars_frame, text="rot around d3")
+        # self_scale4_label.grid(row=0, column=CODE_LEN + 2)
+        # scale_4 = Scale(
+        #     scale_bars_frame,
+        #     variable=self.scale_var_4,
+        #     command=lambda value: self.common_on_scale_move(),
+        #     from_=-3.1,
+        #     to=3.2,
+        #     resolution=0.1,
+        #     length=600,
+        #     tickinterval=TICK_INTERVAL
+        # )
+        # scale_4.grid(row=1, column=CODE_LEN + 2, rowspan=5, padx=(0, 20))
 
     def scale_list_move_func(self, base_latent_code):
         trans_code = base_latent_code
