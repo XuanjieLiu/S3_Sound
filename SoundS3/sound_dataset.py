@@ -144,7 +144,15 @@ def PersistentLoader(dataset, batch_size):
             yield batch
 
 if __name__ == "__main__":
+    from matplotlib import pyplot as plt
     dataset = Dataset('../../makeSoundDatasets/datasets/cleanTrain')
     loader = PersistentLoader(dataset, 32)
-    for i, x in enumerate(loader):
-        print(i, x.shape)
+    for x in loader:
+        x: torch.Tensor
+        x = x[0, :, 0, :, :]
+        x = x.permute((1, 0, 2))
+        x = x.reshape(x.shape[0], -1)
+        plt.pcolormesh(x)
+        plt.show()
+    # for i, x in enumerate(loader):
+    #     print(i, x.shape)

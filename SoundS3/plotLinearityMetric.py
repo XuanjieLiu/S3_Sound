@@ -18,7 +18,7 @@ import rc_params
 rc_params.init()
 from linearity_shared import *
 
-FIGSIZE = (8, 6)
+FIGSIZE = (8, 5.2)
 EXP_LOOKUP = dict([(y, x) for x, y in EXP_GROUPS])
 
 def main():
@@ -127,7 +127,7 @@ def plot(data):
                         return
                 print(exp_display, set_display)
                 sBars[ax_i].addGroup(
-                    values, f'{exp_display}', 
+                    values, f'{exp_display}'.replace('\\\\', ''), 
                     **exp_kw, 
                 )
             f()
@@ -149,7 +149,8 @@ def plot(data):
     axes[0].legend(
         ncol = 3, 
         # loc='center left', bbox_to_anchor=(1, 0), 
-        loc='upper center', bbox_to_anchor=(.5, 0), 
+        # loc='upper center', bbox_to_anchor=(.5, 0), 
+        loc='lower center', bbox_to_anchor=(.5, 1.2), 
     )
 
     fig.tight_layout()
@@ -160,10 +161,15 @@ def plot(data):
     #     right=0.980,
     #     hspace=.6,
     # )
+    # plt.subplots_adjust(
+    #     hspace=.6,
+    #     top=.95, 
+    #     bottom=.222,
+    # )
     plt.subplots_adjust(
-        hspace=.6,
-        top=.95, 
-        bottom=.222,
+        # hspace=.6,
+        top=.86, 
+        bottom=.25,
     )
     plt.show()
 

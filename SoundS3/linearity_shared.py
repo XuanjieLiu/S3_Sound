@@ -36,8 +36,8 @@ SPICE = 'SPICE'
 
 EXP_GROUPS = [
     # display name, path name
-    ('SPS (Ours)', 'vae_symm_4_repeat'), 
-    ('Ours w/o Symmetry', 'vae_symm_0_repeat'), 
+    ('SPS\\textsubscript{VAE}, \\\\$K$=4 (Ours)', 'vae_symm_4_repeat'), 
+    ('SPS\\textsubscript{VAE}, \\\\$K$=0 (Ablation)', 'vae_symm_0_repeat'), 
     ('$\\beta$-VAE (Baseline)', 'beta_vae'), 
     ('SPICE (Baseline)', SPICE), 
 ]
